@@ -5,11 +5,13 @@ export function findAccrualTier(tiers: AccrualTier[], fullYears: number): Accrua
   return tiers.find((t) => fullYears >= t.minYears && (t.maxYears === null || fullYears <= t.maxYears));
 }
 
-/** Base days granted to a leave type for a year, before rollover, before any usage. */
-export function baseDaysAvailable(state: PtoState, leaveType: LeaveType, year: number): number {
-  const override = state.yearOverrides.find((o) => o.year === year)?.daysAvailable[leaveType.id];
-  if (override !== undefined) return override;
+export function yearOverrideDays(state: PtoState, leaveType: LeaveType, year: number): number | undefined {
+  return state.yearOverrides.find((o) => o.year === year)?.daysAvailable[leaveType.id];
+}
 
+/** Computed days granted to a leave type for a year from policy alone (tenure tier or fixed amount),
+ *  ignoring any year override. Used as the starting point for years without one. */
+export function computedDaysAvailable(state: PtoState, leaveType: LeaveType, year: number): number {
   if (leaveType.accrualMode === "fixed") return leaveType.fixedDaysPerYear ?? 0;
 
   if (leaveType.accrualMode === "tenure") {
@@ -20,6 +22,12 @@ export function baseDaysAvailable(state: PtoState, leaveType: LeaveType, year: n
   }
 
   return 0;
+}
+
+/** Base days granted to a leave type for a year, before rollover, before any usage. */
+export function baseDaysAvailable(state: PtoState, leaveType: LeaveType, year: number): number {
+  const override = yearOverrideDays(state, leaveType, year);
+  return override !== undefined ? override : computedDaysAvailable(state, leaveType, year);
 }
 
 /** Rollover hours credited into `year` for a given leave type (only types with rollsOver get any). */
@@ -42,8 +50,11 @@ export interface YearTypeBalance {
 
 export function computeYearBalance(state: PtoState, leaveType: LeaveType, year: number): YearTypeBalance {
   const hoursPerDay = state.settings.hoursPerDay || 7.5;
-  const baseDays = baseDaysAvailable(state, leaveType, year);
-  const rollover = rolloverHoursFor(state, leaveType, year);
+  const override = yearOverrideDays(state, leaveType, year);
+  // An explicit override is the final, already-complete figure for that year (as recorded historically) —
+  // rollover only gets added on top for years computed fresh from tenure/fixed policy, so it's never double-counted.
+  const baseDays = override !== undefined ? override : computedDaysAvailable(state, leaveType, year);
+  const rollover = override !== undefined ? 0 : rolloverHoursFor(state, leaveType, year);
   const availableHours = baseDays * hoursPerDay + rollover;
 
   const usedHours = state.entries

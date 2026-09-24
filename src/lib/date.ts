@@ -49,12 +49,14 @@ export function parseLooseDate(raw: string, fallbackYear?: number): string | nul
     const monthWord = monthDayYear[1].toLowerCase();
     const monthIdx = MONTHS.findIndex((m) => m.startsWith(monthWord.slice(0, 3)));
     if (monthIdx >= 0) {
+      // A recognized month name commits us to this parse: a day that doesn't exist in
+      // that month (e.g. "February 31") must be flagged, not silently rolled over into
+      // the next month by a lenient fallback parser.
       const day = parseInt(monthDayYear[2], 10);
       const year = monthDayYear[3] ? parseInt(monthDayYear[3], 10) : fallbackYear;
-      if (year && day >= 1 && day <= 31) {
-        const d = new Date(year, monthIdx, day);
-        if (d.getMonth() === monthIdx && d.getDate() === day) return toIsoDate(d);
-      }
+      if (!year || day < 1 || day > 31) return null;
+      const d = new Date(year, monthIdx, day);
+      return d.getMonth() === monthIdx && d.getDate() === day ? toIsoDate(d) : null;
     }
   }
 

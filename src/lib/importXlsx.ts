@@ -117,6 +117,8 @@ function parseSheet(
     }
     if (!iso) {
       reasons.push(dateText ? `Could not parse date "${dateText}"` : "Missing date");
+    } else if (iso.slice(0, 4) !== String(fallbackYear)) {
+      reasons.push(`Date "${dateText}" parsed as ${iso} but is on the "${sheetName}" tab — likely a typo in the year`);
     }
 
     const code = typeText.toUpperCase();
