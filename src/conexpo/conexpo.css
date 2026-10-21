@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/* Brand tokens for the CONEXPO-CON/AGG redesign concept. Dark, high-contrast
+   "job site" palette: safety yellow on asphalt, with a warm orange accent. */
+:root {
+  --cx-page: #0f0f0e;
+  --cx-surface: #181816;
+  --cx-surface-2: #22221f;
+  --cx-ink: #f7f6f2;
+  --cx-ink-secondary: #c9c7bd;
+  --cx-ink-muted: #8d8b82;
+  --cx-border: rgba(247, 246, 242, 0.1);
+  --cx-yellow: #ffc20e;
+  --cx-yellow-ink: #141300;
+  --cx-orange: #ff6b1a;
+}
+
+@theme inline {
+  --color-cx-page: var(--cx-page);
+  --color-cx-surface: var(--cx-surface);
+  --color-cx-surface-2: var(--cx-surface-2);
+  --color-cx-ink: var(--cx-ink);
+  --color-cx-ink-secondary: var(--cx-ink-secondary);
+  --color-cx-ink-muted: var(--cx-ink-muted);
+  --color-cx-border: var(--cx-border);
+  --color-cx-yellow: var(--cx-yellow);
+  --color-cx-yellow-ink: var(--cx-yellow-ink);
+  --color-cx-orange: var(--cx-orange);
+
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Archivo", "Inter", system-ui, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--cx-page);
+  color: var(--cx-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--cx-yellow);
+  color: var(--cx-yellow-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--cx-yellow);
+  outline-offset: 3px;
+}
+
+/* Diagonal hazard stripe used as a brand accent. */
+.cx-hazard {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--cx-yellow) 0 14px,
+    var(--cx-page) 14px 28px
+  );
+}
+
+/* Faint blueprint grid behind the hero. */
+.cx-grid {
+  background-image:
+    linear-gradient(var(--cx-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cx-border) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at 70% 30%, #000 30%, transparent 75%);
+}
+
+@keyframes cx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.cx-rise {
+  animation: cx-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cx-rise {
+    animation: none;
+  }
+}

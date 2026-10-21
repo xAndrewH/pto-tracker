@@ -45,3 +45,11 @@ static file host). No backend or environment variables required.
 Vite · React · TypeScript · Tailwind CSS v4 · Zustand (persisted to
 `localStorage`) · SheetJS (`xlsx`, lazy-loaded only when importing) ·
 lucide-react icons.
+
+## CONEXPO-CON/AGG homepage redesign concept
+
+This repo also includes an unofficial redesign concept for the
+CONEXPO-CON/AGG homepage, served at `/conexpo/` (`npm run dev`, then open
+http://localhost:5173/conexpo/). It's a separate Vite entry built with the
+same React + Tailwind stack. The source is in `src/conexpo/`, and all copy and figures
+are in `src/conexpo/content.ts`.
